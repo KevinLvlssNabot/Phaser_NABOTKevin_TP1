@@ -19,6 +19,7 @@ scene: {
 
 var game = new Phaser.Game(config);
 var score = 0;
+var jump = 0;
 
 function init(){
  	var platforms;
@@ -117,9 +118,26 @@ function update(){
 		player.setVelocityX(0);
 	}
 
+	if (player.body.touching.down) {
+			jump = 0;
+	}
+
 	if(cursors.up.isDown && player.body.touching.down){
 		player.setVelocityY(-200);
 	}
+
+	if(cursors.up.isUp && !player.body.touching.down && jump == 0){
+		jump = 1;
+	}
+
+	if (jump == 1) {
+			if (cursors.up.isDown) {
+				player.setVelocityY(-250);
+				jump = 2;
+			}
+	}
+
+
 }
 
 function hitRochers(player, rochers){
@@ -146,7 +164,7 @@ function collectGems(player, gem){
 		rocher.setBounce(0);
 		rocher.setCollideWorldBounds(true);
 		rocher.setVelocity(Phaser.Math.Between(-200, 200), 200);
-		
+
 }
 }
 
