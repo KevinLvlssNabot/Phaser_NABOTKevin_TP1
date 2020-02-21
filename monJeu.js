@@ -21,6 +21,7 @@ var game = new Phaser.Game(config);
 var score = 0;
 var jump = 0;
 
+
 function init(){
  	var platforms;
 	var player;
@@ -96,9 +97,11 @@ function create(){
 
 	scoreText = this.add.text(16,16, 'score: 0', {fontSize: '32px', fill:'#000'});
 	rochers = this.physics.add.group();
-	this.physics.add.collider(rochers, gems);
 	this.physics.add.collider(rochers,platforms, rocherSol);
 	this.physics.add.collider(player,rochers, hitRochers, null, this);
+
+	this.cursorKeys = this.input.keyboard.createCursorKeys();
+	this.ctrl = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
 
 }
 
@@ -109,15 +112,23 @@ function update(){
 		player.anims.play('left', true);
 		player.setVelocityX(-150);
 		player.setFlipX(true);
+		//SPRINT
+			if (this.ctrl.isDown) {
+					player.setVelocityX(-300);
+			}
 	}else if(cursors.right.isDown){
 		player.setVelocityX(150);
 		player.anims.play('left', true);
 		player.setFlipX(false);
+		//SPRINT
+			if (this.ctrl.isDown) {
+					player.setVelocityX(300);
+			}
 	}else{
 		player.anims.play('stop', true);
 		player.setVelocityX(0);
 	}
-
+// Double Jump
 	if (player.body.touching.down) {
 			jump = 0;
 	}
@@ -136,7 +147,6 @@ function update(){
 				jump = 2;
 			}
 	}
-
 
 }
 
