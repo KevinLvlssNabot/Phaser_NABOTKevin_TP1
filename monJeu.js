@@ -19,6 +19,7 @@ scene: {
 
 var game = new Phaser.Game(config);
 var score = 0;
+var jump = 0;
 
 function init(){
  	var platforms;
@@ -36,7 +37,7 @@ function preload(){
 	this.load.image('groundFond','assets/far-grounds.png');
 	this.load.image('gems','assets/gems.png');
 	this.load.image('sol','assets/sol.png');
-	this.load.image('rochers','assets/rochers.png');
+	this.load.image('rochers','assets/meteor.png');
 	this.load.image('arbre','assets/arbre.png');
 	this.load.image('platehaute','assets/platehaute.png');
 	this.load.spritesheet('perso','assets/personne.png',{frameWidth: 25, frameHeight: 50});
@@ -95,6 +96,7 @@ function create(){
 
 	scoreText = this.add.text(16,16, 'score: 0', {fontSize: '32px', fill:'#000'});
 	rochers = this.physics.add.group();
+	this.physics.add.collider(rochers, gems);
 	this.physics.add.collider(rochers,platforms, rocherSol);
 	this.physics.add.collider(player,rochers, hitRochers, null, this);
 
@@ -116,9 +118,26 @@ function update(){
 		player.setVelocityX(0);
 	}
 
+	if (player.body.touching.down) {
+			jump = 0;
+	}
+
 	if(cursors.up.isDown && player.body.touching.down){
 		player.setVelocityY(-200);
 	}
+
+	if(cursors.up.isUp && !player.body.touching.down && jump == 0){
+		jump = 1;
+	}
+
+	if (jump == 1) {
+			if (cursors.up.isDown) {
+				player.setVelocityY(-250);
+				jump = 2;
+			}
+	}
+
+
 }
 
 function hitRochers(player, rochers){
@@ -144,7 +163,8 @@ function collectGems(player, gem){
 		var rocher = rochers.create(x, 20, 'rochers');
 		rocher.setBounce(0);
 		rocher.setCollideWorldBounds(true);
-		rocher.setVelocity(Phaser.Math.Between(-200, 400), 200);
+		rocher.setVelocity(Phaser.Math.Between(-200, 200), 200);
+
 }
 }
 
