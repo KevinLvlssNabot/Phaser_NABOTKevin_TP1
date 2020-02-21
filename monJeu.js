@@ -146,6 +146,7 @@ function collectGems(player, gem){
 		rocher.setBounce(0);
 		rocher.setCollideWorldBounds(true);
 		rocher.setVelocity(Phaser.Math.Between(-200, 200), 200);
+		
 }
 }
 
