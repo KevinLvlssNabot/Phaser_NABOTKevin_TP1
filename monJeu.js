@@ -95,7 +95,7 @@ function create(){
 
 	scoreText = this.add.text(16,16, 'score: 0', {fontSize: '32px', fill:'#000'});
 	rochers = this.physics.add.group();
-	this.physics.add.collider(rochers,platforms);
+	this.physics.add.collider(rochers,platforms, rocherSol);
 	this.physics.add.collider(player,rochers, hitRochers, null, this);
 
 }
@@ -119,8 +119,8 @@ function update(){
 	if(cursors.up.isDown && player.body.touching.down){
 		player.setVelocityY(-200);
 	}
-
 }
+
 function hitRochers(player, rochers){
 	this.physics.pause();
 	player.setTint(0xff0000);
@@ -137,13 +137,17 @@ function collectGems(player, gem){
 			child.enableBody(true,child.x,0, true, true);
 		});
 
+
 		var x = (player.x < 400) ?
 			Phaser.Math.Between(400,800):
 			Phaser.Math.Between(0,400);
-		var rocher = rochers.create(x, 16, 'rochers');
-		rocher.setBounce(1);
+		var rocher = rochers.create(x, 20, 'rochers');
+		rocher.setBounce(0);
 		rocher.setCollideWorldBounds(true);
-		rocher.setVelocity(Phaser.Math.Between(-200, 200), 20);
-
+		rocher.setVelocity(Phaser.Math.Between(-200, 400), 200);
 }
+}
+
+function rocherSol(rocher, platforms) {
+    rocher.setVelocityX(0);
 }
