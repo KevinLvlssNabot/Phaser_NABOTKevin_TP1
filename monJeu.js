@@ -20,6 +20,8 @@ scene: {
 var game = new Phaser.Game(config);
 var score = 0;
 var jump = 0;
+var pv = 3;
+
 
 function init(){
  	var platforms;
@@ -40,6 +42,9 @@ function preload(){
 	this.load.image('rochers','assets/meteor.png');
 	this.load.image('arbre','assets/arbre.png');
 	this.load.image('platehaute','assets/platehaute.png');
+	this.load.image('pv1','assets/pv.png');
+	this.load.image('pv2','assets/pv.png');
+	this.load.image('pv3','assets/pv.png');
 	this.load.spritesheet('perso','assets/personne.png',{frameWidth: 25, frameHeight: 50});
 }
 
@@ -53,6 +58,9 @@ function create(){
 	this.add.image(400,500,'groundFond');
 	this.add.image(200,485,'arbre');
 	this.add.image(300,620,'mer');
+	this.add.image(650,30,'pv1').setScale(1.5);
+	this.add.image(700,30,'pv2').setScale(1.5);
+	this.add.image(750,30,'pv3').setScale(1.5);
 
 
 	platforms = this.physics.add.staticGroup();
@@ -90,15 +98,22 @@ function create(){
 		setXY: {x:12,y:0,stepX:70}
 	});
 
+//	pv = this.physics.add.group({
+//		key: 'pv',
+//		repeat:2,
+//		setXY: {x:12,y:12,stepX:100}
+//	});
 
 	this.physics.add.collider(gems, platforms);
 	this.physics.add.overlap(player,gems,collectGems,null,this);
 
 	scoreText = this.add.text(16,16, 'score: 0', {fontSize: '32px', fill:'#000'});
 	rochers = this.physics.add.group();
-	this.physics.add.collider(rochers, gems);
 	this.physics.add.collider(rochers,platforms, rocherSol);
 	this.physics.add.collider(player,rochers, hitRochers, null, this);
+
+	this.cursorKeys = this.input.keyboard.createCursorKeys();
+	this.ctrl = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
 
 }
 
@@ -109,21 +124,30 @@ function update(){
 		player.anims.play('left', true);
 		player.setVelocityX(-150);
 		player.setFlipX(true);
+		//SPRINT
+			if (this.ctrl.isDown) {
+					player.setVelocityX(-300);
+			}
 	}else if(cursors.right.isDown){
 		player.setVelocityX(150);
 		player.anims.play('left', true);
 		player.setFlipX(false);
+		//SPRINT
+			if (this.ctrl.isDown) {
+					player.setVelocityX(300);
+			}
 	}else{
 		player.anims.play('stop', true);
 		player.setVelocityX(0);
 	}
-
+// Double Jump
 	if (player.body.touching.down) {
 			jump = 0;
 	}
 
 	if(cursors.up.isDown && player.body.touching.down){
 		player.setVelocityY(-200);
+		player.clearTint(0xff0000);
 	}
 
 	if(cursors.up.isUp && !player.body.touching.down && jump == 0){
@@ -136,16 +160,23 @@ function update(){
 				jump = 2;
 			}
 	}
-
-
 }
 
 function hitRochers(player, rochers){
-	this.physics.pause();
-	player.setTint(0xff0000);
-	player.anims.play('turn');
-	gameOver=true;
+	if (pv == 0) {
+		this.physics.pause();
+		player.setTint(0xff0000);
+		player.anims.play('turn');
+		gameOver=true;
+	} else if (pv > 0){
+		pv = pv -1;
+		player.setTint(0xff0000);
+	}
+	if (pv == 3) {
+		pv3.visible = false;
+	}
 }
+
 
 function collectGems(player, gem){
 	gem.disableBody(true,true);
