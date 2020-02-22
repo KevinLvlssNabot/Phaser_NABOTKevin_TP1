@@ -20,6 +20,7 @@ scene: {
 var game = new Phaser.Game(config);
 var score = 0;
 var jump = 0;
+var pv = 3;
 
 
 function init(){
@@ -29,6 +30,9 @@ function init(){
 	var gems;
 	var scoreText;
 	var rochers;
+	var pv1;
+	var pv2;
+	var pv3;
 }
 
 function preload(){
@@ -41,6 +45,9 @@ function preload(){
 	this.load.image('rochers','assets/meteor.png');
 	this.load.image('arbre','assets/arbre.png');
 	this.load.image('platehaute','assets/platehaute.png');
+	this.load.image('pv1','assets/pv.png');
+	this.load.image('pv2','assets/pv.png');
+	this.load.image('pv3','assets/pv.png');
 	this.load.spritesheet('perso','assets/personne.png',{frameWidth: 25, frameHeight: 50});
 }
 
@@ -54,6 +61,9 @@ function create(){
 	this.add.image(400,500,'groundFond');
 	this.add.image(200,485,'arbre');
 	this.add.image(300,620,'mer');
+	pv1 = this.add.image(650,30,'pv1').setScale(1.5);
+	pv2 = this.add.image(700,30,'pv2').setScale(1.5);
+	pv3 = this.add.image(750,30,'pv3').setScale(1.5);
 
 
 	platforms = this.physics.add.staticGroup();
@@ -91,6 +101,11 @@ function create(){
 		setXY: {x:12,y:0,stepX:70}
 	});
 
+//	pv = this.physics.add.group({
+//		key: 'pv',
+//		repeat:2,
+//		setXY: {x:12,y:12,stepX:100}
+//	});
 
 	this.physics.add.collider(gems, platforms);
 	this.physics.add.overlap(player,gems,collectGems,null,this);
@@ -135,6 +150,7 @@ function update(){
 
 	if(cursors.up.isDown && player.body.touching.down){
 		player.setVelocityY(-200);
+		player.clearTint(0xff0000);
 	}
 
 	if(cursors.up.isUp && !player.body.touching.down && jump == 0){
@@ -147,15 +163,27 @@ function update(){
 				jump = 2;
 			}
 	}
-
 }
 
 function hitRochers(player, rochers){
-	this.physics.pause();
-	player.setTint(0xff0000);
-	player.anims.play('turn');
-	gameOver=true;
+	if (pv == 0) {
+		this.physics.pause();
+		player.setTint(0xff0000);
+		player.anims.play('turn');
+		pv1.visible = false;
+		gameOver=true;
+	} else if (pv > 0){
+		pv = pv -1;
+		player.setTint(0xff0000);
+	}
+	if (pv == 2) {
+		pv3.visible = false;
+	}
+	if (pv == 1) {
+		pv2.visible = false;
+	}
 }
+
 
 function collectGems(player, gem){
 	gem.disableBody(true,true);
