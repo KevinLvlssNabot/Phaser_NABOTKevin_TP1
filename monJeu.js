@@ -30,6 +30,9 @@ function init(){
 	var gems;
 	var scoreText;
 	var rochers;
+	var pv1;
+	var pv2;
+	var pv3;
 }
 
 function preload(){
@@ -58,9 +61,9 @@ function create(){
 	this.add.image(400,500,'groundFond');
 	this.add.image(200,485,'arbre');
 	this.add.image(300,620,'mer');
-	this.add.image(650,30,'pv1').setScale(1.5);
-	this.add.image(700,30,'pv2').setScale(1.5);
-	this.add.image(750,30,'pv3').setScale(1.5);
+	pv1 = this.add.image(650,30,'pv1').setScale(1.5);
+	pv2 = this.add.image(700,30,'pv2').setScale(1.5);
+	pv3 = this.add.image(750,30,'pv3').setScale(1.5);
 
 
 	platforms = this.physics.add.staticGroup();
@@ -167,13 +170,17 @@ function hitRochers(player, rochers){
 		this.physics.pause();
 		player.setTint(0xff0000);
 		player.anims.play('turn');
+		pv1.visible = false;
 		gameOver=true;
 	} else if (pv > 0){
 		pv = pv -1;
 		player.setTint(0xff0000);
 	}
-	if (pv == 3) {
+	if (pv == 2) {
 		pv3.visible = false;
+	}
+	if (pv == 1) {
+		pv2.visible = false;
 	}
 }
 
