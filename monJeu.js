@@ -21,6 +21,7 @@ var game = new Phaser.Game(config);
 var score = 0;
 var jump = 0;
 var pv = 3;
+var scorePotion = 0;
 
 
 function init(){
@@ -30,6 +31,7 @@ function init(){
 	var gems;
 	var scoreText;
 	var rochers;
+	var potions;
 	var pv1;
 	var pv2;
 	var pv3;
@@ -48,6 +50,7 @@ function preload(){
 	this.load.image('pv1','assets/pv.png');
 	this.load.image('pv2','assets/pv.png');
 	this.load.image('pv3','assets/pv.png');
+	this.load.image('potions','assets/potion.png');
 	this.load.spritesheet('perso','assets/personne.png',{frameWidth: 25, frameHeight: 50});
 }
 
@@ -71,8 +74,9 @@ function create(){
 	platforms.create(400,588,'platehaute');
 	platforms.create(100,588,'sol');
 	platforms.create(600,588,'sol');
-//	platforms.create(600,400,'platehaute');
-//	platforms.create(50,250,'platehaute');
+	platforms.create(600,520,'platehaute').setScale(0.8).setSize(68,45).setOffset(15,10);
+	platforms.create(470,460,'platehaute').setScale(0.8).setSize(68,45).setOffset(15,10);
+	platforms.create(790,590,'platehaute');
 
 	player = this.physics.add.sprite(100,450,'perso');
 	player.setCollideWorldBounds(true);
@@ -110,9 +114,14 @@ function create(){
 	this.physics.add.collider(gems, platforms);
 	this.physics.add.overlap(player,gems,collectGems,null,this);
 
+	potion = this.physics.add.group();
+	this.physics.add.collider(potion, platforms);
+	this.physics.add.overlap(player,potion,collectPotion,null,this);
+
 	scoreText = this.add.text(16,16, 'score: 0', {fontSize: '32px', fill:'#000'});
 	rochers = this.physics.add.group();
 	this.physics.add.collider(rochers,platforms, rocherSol);
+	this.physics.add.collider(rochers, potion, rocherPotion);
 	this.physics.add.collider(player,rochers, hitRochers, null, this);
 
 	this.cursorKeys = this.input.keyboard.createCursorKeys();
@@ -166,6 +175,7 @@ function update(){
 }
 
 function hitRochers(player, rochers){
+			rochers.disableBody(true, true);
 	if (pv == 0) {
 		this.physics.pause();
 		player.setTint(0xff0000);
@@ -188,6 +198,7 @@ function hitRochers(player, rochers){
 function collectGems(player, gem){
 	gem.disableBody(true,true);
 	score += 10;
+	scorePotion += 10;
 	scoreText.setText('score: '+score);
 	if (gems.countActive(true) === 0){
 		gems.children.iterate(function(child){
@@ -204,8 +215,35 @@ function collectGems(player, gem){
 		rocher.setVelocity(Phaser.Math.Between(-200, 200), 200);
 
 }
+	if (scorePotion == 250) {
+		x = (player.x < 400) ?
+			Phaser.Math.Between(400,800):
+			Phaser.Math.Between(0,400);
+		potions = potion.create(x, 20, 'potions');
+		potions.setBounce(0);
+		potions.setCollideWorldBounds(true);
+		potions.setVelocity(Phaser.Math.Between(0, 0), 200);
+	}
 }
 
 function rocherSol(rocher, platforms) {
     rocher.setVelocityX(0);
+}
+
+function collectPotion(player, potion){
+	potion.disableBody(true, true);
+	scorePotion = 0;
+	pv++;
+		if (pv == 2) {
+				pv2.visible = true;
+		} else if (pv == 3) {
+				pv3.visible = true;
+		}
+	if (pv > 3) {
+		pv = 3;
+	}
+}
+
+function rocherPotion(rocher, potion){
+	rocher.setScale(1.5);
 }
