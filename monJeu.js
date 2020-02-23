@@ -29,12 +29,16 @@ function init(){
 	var player;
 	var cursors;
 	var gems;
+	var walls;
 	var scoreText;
 	var rochers;
 	var potions;
 	var pv1;
 	var pv2;
 	var pv3;
+	var ennemis;
+	var ennemis2;
+	var ennemis3;
 }
 
 function preload(){
@@ -51,7 +55,10 @@ function preload(){
 	this.load.image('pv2','assets/pv.png');
 	this.load.image('pv3','assets/pv.png');
 	this.load.image('potions','assets/potion.png');
+	this.load.image('walls','assets/walls.png');
 	this.load.spritesheet('perso','assets/personne.png',{frameWidth: 25, frameHeight: 50});
+	this.load.spritesheet('ennemis','assets/ennemis.png',{frameWidth: 40, frameHeight: 39});
+
 }
 
 
@@ -76,13 +83,65 @@ function create(){
 	platforms.create(600,588,'sol');
 	platforms.create(600,520,'platehaute').setScale(0.8).setSize(68,45).setOffset(15,10);
 	platforms.create(470,460,'platehaute').setScale(0.8).setSize(68,45).setOffset(15,10);
+	platforms.create(390,460,'platehaute').setScale(0.8).setSize(68,45).setOffset(15,10);
 	platforms.create(790,590,'platehaute');
+	platforms.create(190,410,'platehaute');
+	platforms.create(550,280,'platehaute');
+	platforms.create(450,280,'platehaute');
+	platforms.create(100,350,'platehaute').setScale(0.8).setSize(68,45).setOffset(15,10);
+	platforms.create(300,300,'platehaute').setScale(0.5).setSize(45,35).setOffset(25,19);;
 
-	player = this.physics.add.sprite(100,450,'perso');
+	walls = this.physics.add.staticGroup();
+	walls.create(245,520,'walls').visible = false;
+	walls.create(455,520,'walls').visible = false;
+	walls.create(395,220,'walls').visible = false;
+	walls.create(605,220,'walls').visible = false;
+	walls.create(745,520,'walls').visible = false;
+
+
+	ennemis = this.physics.add.sprite(300,450,'ennemis').setSize(30,40).setScale(0.8);
+	ennemis.setCollideWorldBounds(true);
+	ennemis.setBounceY(0);
+	ennemis.setBounceX(1);
+	ennemis.body.setGravityY(100);
+	ennemis.setVelocityX(40);
+	this.physics.add.collider(ennemis,platforms);
+	this.physics.add.collider(ennemis,walls);
+
+	ennemis2 = this.physics.add.sprite(650,450,'ennemis').setSize(30,40).setScale(0.8);
+	ennemis2.setCollideWorldBounds(true);
+	ennemis2.setBounceY(0);
+	ennemis2.setBounceX(1);
+	ennemis2.body.setGravityY(100);
+	ennemis2.setVelocityX(40);
+	this.physics.add.collider(ennemis2,platforms);
+	this.physics.add.collider(ennemis2,walls);
+
+	ennemis3 = this.physics.add.sprite(550,220,'ennemis').setSize(30,40).setScale(0.8);
+	ennemis3.setCollideWorldBounds(true);
+	ennemis3.setBounceY(0);
+	ennemis3.setBounceX(1);
+	ennemis3.body.setGravityY(100);
+	ennemis3.setVelocityX(40);
+	this.physics.add.collider(ennemis3,platforms);
+	this.physics.add.collider(ennemis3,walls);
+
+	player = this.physics.add.sprite(100,450,'perso').setScale(0.8);
 	player.setCollideWorldBounds(true);
 	player.setBounce(0);
 	player.body.setGravityY(100);
 	this.physics.add.collider(player,platforms);
+	this.physics.add.collider(player,ennemis, hitPlayer, null, this);
+	this.physics.add.collider(player,ennemis2, hitPlayer2, null, this);
+	this.physics.add.collider(player,ennemis3, hitPlayer3, null, this);
+
+
+	this.anims.create({
+		key: 'gauche',
+		frames: this.anims.generateFrameNumbers('ennemis', {start: 0, end: 7}),
+		frameRate: 5,
+		repeat: -1
+	});
 
 	cursors = this.input.keyboard.createCursorKeys();
 
@@ -116,12 +175,15 @@ function create(){
 
 	potion = this.physics.add.group();
 	this.physics.add.collider(potion, platforms);
+	this.physics.add.overlap(potion, ennemis, ennemisPotion);
+	this.physics.add.overlap(potion, ennemis2, ennemisPotion2);
+	this.physics.add.overlap(potion, ennemis3, ennemisPotion3);
 	this.physics.add.overlap(player,potion,collectPotion,null,this);
 
 	scoreText = this.add.text(16,16, 'score: 0', {fontSize: '32px', fill:'#000'});
 	rochers = this.physics.add.group();
 	this.physics.add.collider(rochers,platforms, rocherSol);
-	this.physics.add.collider(rochers, potion, rocherPotion);
+	this.physics.add.overlap(rochers, potion, rocherPotion);
 	this.physics.add.collider(player,rochers, hitRochers, null, this);
 
 	this.cursorKeys = this.input.keyboard.createCursorKeys();
@@ -132,21 +194,22 @@ function create(){
 
 
 function update(){
+
 	if(cursors.left.isDown){
 		player.anims.play('left', true);
-		player.setVelocityX(-150);
+		player.setVelocityX(-100);
 		player.setFlipX(true);
 		//SPRINT
 			if (this.ctrl.isDown) {
-					player.setVelocityX(-300);
+					player.setVelocityX(-200);
 			}
 	}else if(cursors.right.isDown){
-		player.setVelocityX(150);
+		player.setVelocityX(100);
 		player.anims.play('left', true);
 		player.setFlipX(false);
 		//SPRINT
 			if (this.ctrl.isDown) {
-					player.setVelocityX(300);
+					player.setVelocityX(200);
 			}
 	}else{
 		player.anims.play('stop', true);
@@ -172,6 +235,35 @@ function update(){
 				jump = 2;
 			}
 	}
+
+	// ennemis
+
+		if (ennemis.body.velocity.x < 0) {
+			ennemis.setFlipX(true);
+		} else {
+			ennemis.anims.play('gauche', true);
+			ennemis.setFlipX(false);
+		}
+
+		if (ennemis2.body.velocity.x < 0) {
+			ennemis2.setFlipX(true);
+		} else {
+			ennemis2.anims.play('gauche', true);
+			ennemis2.setFlipX(false);
+		}
+
+		if (ennemis3.body.velocity.x < 0) {
+			ennemis3.setFlipX(true);
+		} else {
+			ennemis3.anims.play('gauche', true);
+			ennemis3.setFlipX(false);
+		}
+
+		if (pv == 0) {
+			pv1.visible = false;
+			this.physics.pause();
+			gameOver = true;
+		}
 }
 
 function hitRochers(player, rochers){
@@ -181,7 +273,7 @@ function hitRochers(player, rochers){
 		player.setTint(0xff0000);
 		player.anims.play('turn');
 		pv1.visible = false;
-		gameOver=true;
+		gameOver = true;
 	} else if (pv > 0){
 		pv = pv -1;
 		player.setTint(0xff0000);
@@ -201,6 +293,9 @@ function collectGems(player, gem){
 	scorePotion += 10;
 	scoreText.setText('score: '+score);
 	if (gems.countActive(true) === 0){
+		x = (player.x < 400) ?
+			Phaser.Math.Between(400,800):
+			Phaser.Math.Between(0,400);
 		gems.children.iterate(function(child){
 			child.enableBody(true,child.x,0, true, true);
 		});
@@ -215,7 +310,7 @@ function collectGems(player, gem){
 		rocher.setVelocity(Phaser.Math.Between(-200, 200), 200);
 
 }
-	if (scorePotion == 250) {
+	if (scorePotion == 10) {
 		x = (player.x < 400) ?
 			Phaser.Math.Between(400,800):
 			Phaser.Math.Between(0,400);
@@ -246,4 +341,90 @@ function collectPotion(player, potion){
 
 function rocherPotion(rocher, potion){
 	rocher.setScale(1.5);
+	potion.disableBody(true,true);
+	scorePotion = 0;
+}
+
+function ennemisPotion(ennemis, potion){
+	ennemis.setScale(1.5);
+	potion.disableBody(true,true);
+	scorePotion = 0;
+	ennemis.setVelocityY(-200);
+}
+
+function ennemisPotion2(ennemis2, potion){
+	ennemis2.setScale(1.5);
+	potion.disableBody(true,true);
+	scorePotion = 0;
+	ennemis2.setVelocityY(-200);
+}
+
+function ennemisPotion3(ennemis3, potion){
+	ennemis3.setScale(1.5);
+	potion.disableBody(true,true);
+	scorePotion = 0;
+	ennemis3.setVelocityY(-200);
+}
+
+function hitPlayer(player, ennemis){
+	player.setVelocityY(-300);
+	player.setVelocityX(-100);
+	ennemis.setVelocityX(40);
+	if (pv == 0) {
+		player.setTint(0xff0000);
+		player.anims.play('turn');
+		pv1.visible = false;
+		gameOver = true;
+	} else if (pv > 0){
+		pv = pv -1;
+		player.setTint(0xff0000);
+	}
+	if (pv == 2) {
+		pv3.visible = false;
+	}
+	if (pv == 1) {
+		pv2.visible = false;
+	}
+}
+
+function hitPlayer2(player, ennemis2){
+	player.setVelocityY(-300);
+	player.setVelocityX(-100);
+	ennemis2.setVelocityX(40);
+	if (pv == 0) {
+		player.setTint(0xff0000);
+		player.anims.play('turn');
+		pv1.visible = false;
+		gameOver = true;
+	} else if (pv > 0){
+		pv = pv -1;
+		player.setTint(0xff0000);
+	}
+	if (pv == 2) {
+		pv3.visible = false;
+	}
+	if (pv == 1) {
+		pv2.visible = false;
+	}
+}
+
+function hitPlayer3(player, ennemis3){
+	player.setVelocityY(-300);
+	player.setVelocityX(-100);
+	ennemis3.setVelocityX(40);
+	if (pv == 0) {
+		player.setTint(0xff0000);
+		player.anims.play('turn');
+		pv1.visible = false;
+		gameOver = true;
+	} else if (pv > 0){
+		pv = pv -1;
+		player.setTint(0xff0000);
+	}
+	if (pv == 2) {
+		pv3.visible = false;
+	}
+	if (pv == 1) {
+		pv2.visible = false;
+	}
 }
