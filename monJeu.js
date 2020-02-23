@@ -6,7 +6,7 @@ physics: {
         default: 'arcade',
         arcade: {
             gravity: { y: 600 },
-            debug: true
+            debug: false
         }
     },
 scene: {
@@ -22,6 +22,10 @@ var score = 0;
 var jump = 0;
 var pv = 3;
 var scorePotion = 0;
+var charge = 0;
+var pvEnnemis = 3;
+var pvEnnemis2 = 3;
+var pvEnnemis3 = 3;
 
 
 function init(){
@@ -39,6 +43,7 @@ function init(){
 	var ennemis;
 	var ennemis2;
 	var ennemis3;
+	var projectiles;
 }
 
 function preload(){
@@ -56,6 +61,7 @@ function preload(){
 	this.load.image('pv3','assets/pv.png');
 	this.load.image('potions','assets/potion.png');
 	this.load.image('walls','assets/walls.png');
+	this.load.image('projectiles','assets/projectiles.png');
 	this.load.spritesheet('perso','assets/personne.png',{frameWidth: 25, frameHeight: 50});
 	this.load.spritesheet('ennemis','assets/ennemis.png',{frameWidth: 40, frameHeight: 39});
 
@@ -188,6 +194,19 @@ function create(){
 
 	this.cursorKeys = this.input.keyboard.createCursorKeys();
 	this.ctrl = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
+	this.space = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+
+	projectiles = this.physics.add.group({
+		key: 'projectiles',
+		maxSize: 10,
+		setXY: {x:player.x,y:player.y}
+	});
+
+
+		this.physics.add.collider(projectiles,platforms, disparaitCaillou);
+		this.physics.add.collider(projectiles,ennemis, disparaitEnnemis);
+		this.physics.add.collider(projectiles,ennemis2, disparaitEnnemis2);
+		this.physics.add.collider(projectiles,ennemis3, disparaitEnnemis3);
 
 }
 
@@ -236,6 +255,28 @@ function update(){
 			}
 	}
 
+	if (this.space.isDown) {
+		charge = 1;
+		//	if (player.body.velocity.x > 0) {
+		if (projectiles.countActive(true) === 0){
+			projectiles.children.iterate(function(child){
+				child.enableBody(true,player.x, player.y,0, true, true);
+			});
+	}
+		//	}
+		}
+
+
+	if (this.space.isUp && charge == 1) {
+		if (player.body.velocity.x > 0) {
+			projectiles.setVelocityX(200);
+		} else if (player.body.velocity.x < 0) {
+			projectiles.setVelocityX(-200);
+		}else if (player.body.velocity.x == 0){
+			projectiles.setVelocityY(-200);
+		}
+		projectiles.setVelocityY(-10);
+}
 	// ennemis
 
 		if (ennemis.body.velocity.x < 0) {
@@ -264,6 +305,8 @@ function update(){
 			this.physics.pause();
 			gameOver = true;
 		}
+
+
 }
 
 function hitRochers(player, rochers){
@@ -293,9 +336,6 @@ function collectGems(player, gem){
 	scorePotion += 10;
 	scoreText.setText('score: '+score);
 	if (gems.countActive(true) === 0){
-		x = (player.x < 400) ?
-			Phaser.Math.Between(400,800):
-			Phaser.Math.Between(0,400);
 		gems.children.iterate(function(child){
 			child.enableBody(true,child.x,0, true, true);
 		});
@@ -428,3 +468,45 @@ function hitPlayer3(player, ennemis3){
 		pv2.visible = false;
 	}
 }
+
+function disparaitCaillou(projectiles, platforms){
+	projectiles.disableBody(true,true);
+}
+
+function disparaitEnnemis(ennemis, projectiles){
+	pvEnnemis = pvEnnemis -1;
+	ennemis.setVelocityX(40);
+	ennemis.setTint(0xff0000);
+	projectiles.disableBody(true, true);
+		if (pvEnnemis == 0) {
+			ennemis.disableBody(true, true);
+		}
+}
+
+function disparaitEnnemis2(ennemis2, projectiles){
+	pvEnnemis2 = pvEnnemis2 -1;
+	ennemis2.setVelocityX(40);
+	ennemis2.setTint(0xff0000);
+	projectiles.disableBody(true, true);
+		if (pvEnnemis2 == 0) {
+			ennemis2.disableBody(true, true);
+		}
+}
+
+function disparaitEnnemis3(ennemis3, projectiles){
+	pvEnnemis3 = pvEnnemis3 -1;
+	ennemis3.setTint(0xff0000);
+	ennemis3.setVelocityX(40);
+	projectiles.disableBody(true, true);
+		if (pvEnnemis3 == 0) {
+			ennemis3.disableBody(true, true);
+		}
+}
+//function shoot(projectiles){
+//	var projectile = this.projectiles.get(player.x, player.y);
+//		if (projectile) {
+//				projectile.setActive = true;
+//				projectile.setVisible = true;
+//				projectile.body.velocity.x = 200;
+//		}
+//}
