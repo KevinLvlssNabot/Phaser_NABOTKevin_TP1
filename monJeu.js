@@ -310,7 +310,7 @@ function collectGems(player, gem){
 		rocher.setVelocity(Phaser.Math.Between(-200, 200), 200);
 
 }
-	if (scorePotion == 10) {
+	if (scorePotion == 200) {
 		x = (player.x < 400) ?
 			Phaser.Math.Between(400,800):
 			Phaser.Math.Between(0,400);
