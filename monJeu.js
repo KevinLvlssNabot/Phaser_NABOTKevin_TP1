@@ -6,7 +6,7 @@ physics: {
         default: 'arcade',
         arcade: {
             gravity: { y: 600 },
-            debug: false
+            debug: true,
         }
     },
 scene: {
@@ -62,7 +62,7 @@ function preload(){
 	this.load.image('potions','assets/potion.png');
 	this.load.image('walls','assets/walls.png');
 	this.load.image('projectiles','assets/projectiles.png');
-	this.load.spritesheet('perso','assets/personne.png',{frameWidth: 25, frameHeight: 50});
+	this.load.spritesheet('perso','assets/PoolMen_Idle.png',{frameWidth: 30, frameHeight: 47});
 	this.load.spritesheet('ennemis','assets/ennemis.png',{frameWidth: 40, frameHeight: 39});
 
 }
@@ -141,6 +141,12 @@ function create(){
 	this.physics.add.collider(player,ennemis2, hitPlayer2, null, this);
 	this.physics.add.collider(player,ennemis3, hitPlayer3, null, this);
 
+	this.anims.create({
+		key: 'idle',
+		frames: this.anims.generateFrameNumbers('perso', {start: 0, end: 1}),
+		frameRate: 2,
+		repeat: -1
+	});
 
 	this.anims.create({
 		key: 'gauche',
@@ -214,6 +220,7 @@ function create(){
 
 function update(){
 
+
 	if(cursors.left.isDown){
 		player.anims.play('left', true);
 		player.setVelocityX(-100);
@@ -231,7 +238,7 @@ function update(){
 					player.setVelocityX(200);
 			}
 	}else{
-		player.anims.play('stop', true);
+		player.anims.play('idle', true);
 		player.setVelocityX(0);
 	}
 // Double Jump
