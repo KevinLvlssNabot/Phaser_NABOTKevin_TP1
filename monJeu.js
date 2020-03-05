@@ -223,6 +223,7 @@ function update(){
 
 	if(cursors.left.isDown){
 		player.anims.play('left', true);
+		player.anims.play('idle', false);
 		player.setVelocityX(-100);
 		player.setFlipX(true);
 		//SPRINT
@@ -232,6 +233,7 @@ function update(){
 	}else if(cursors.right.isDown){
 		player.setVelocityX(100);
 		player.anims.play('left', true);
+		player.anims.play('idle', false);
 		player.setFlipX(false);
 		//SPRINT
 			if (this.ctrl.isDown) {
