@@ -151,9 +151,9 @@ function create(){
 
 	this.anims.create({
 		key: 'jump',
-		frames: this.anims.generateFrameNumbers('perso_jump', {start: 1, end: 2}),
-		frameRate: 10,
-		repeat: -1
+		frames: this.anims.generateFrameNumbers('perso_jump', {start: 0, end: 2}),
+		frameRate: 4,
+		repeat: 0
 	});
 
 	this.anims.create({
@@ -247,14 +247,14 @@ function update(){
 			if (this.ctrl.isDown) {
 					player.setVelocityX(200);
 			}
-	}else{
-		player.anims.play('idle', true);
+	} else {
 		player.setVelocityX(0);
 	}
 // Double Jump
 	if (!player.body.touching.down) {
-		player.anims.play('idle', false);
 		player.anims.play('jump', true);
+	} else {
+		player.anims.play('idle', true);
 	}
 
 	if (player.body.touching.down) {
