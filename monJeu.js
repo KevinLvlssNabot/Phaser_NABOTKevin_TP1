@@ -6,7 +6,7 @@ physics: {
         default: 'arcade',
         arcade: {
             gravity: { y: 600 },
-            debug: true,
+            debug: false,
         }
     },
 scene: {
@@ -63,6 +63,7 @@ function preload(){
 	this.load.image('walls','assets/walls.png');
 	this.load.image('projectiles','assets/projectiles.png');
 	this.load.spritesheet('perso','assets/PoolMen_Idle.png',{frameWidth: 30, frameHeight: 47});
+	this.load.spritesheet('perso_jump','assets/PoolMen_Jump.png',{frameWidth: 30, frameHeight: 47});
 	this.load.spritesheet('ennemis','assets/ennemis.png',{frameWidth: 40, frameHeight: 39});
 
 }
@@ -145,6 +146,13 @@ function create(){
 		key: 'idle',
 		frames: this.anims.generateFrameNumbers('perso', {start: 0, end: 1}),
 		frameRate: 2,
+		repeat: -1
+	});
+
+	this.anims.create({
+		key: 'jump',
+		frames: this.anims.generateFrameNumbers('perso_jump', {start: 1, end: 2}),
+		frameRate: 10,
 		repeat: -1
 	});
 
@@ -244,6 +252,11 @@ function update(){
 		player.setVelocityX(0);
 	}
 // Double Jump
+	if (!player.body.touching.down) {
+		player.anims.play('idle', false);
+		player.anims.play('jump', true);
+	}
+
 	if (player.body.touching.down) {
 			jump = 0;
 	}
