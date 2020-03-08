@@ -64,6 +64,7 @@ function preload(){
 	this.load.image('projectiles','assets/projectiles.png');
 	this.load.spritesheet('perso','assets/PoolMen_Idle.png',{frameWidth: 30, frameHeight: 47});
 	this.load.spritesheet('perso_jump','assets/PoolMen_Jump.png',{frameWidth: 30, frameHeight: 47});
+	this.load.spritesheet('perso_walk','assets/PoolMen_Walk.png',{frameWidth: 30, frameHeight: 47});
 	this.load.spritesheet('ennemis','assets/ennemis.png',{frameWidth: 40, frameHeight: 39});
 
 }
@@ -157,6 +158,13 @@ function create(){
 	});
 
 	this.anims.create({
+		key: 'walk',
+		frames: this.anims.generateFrameNumbers('perso_walk', {start: 0, end: 1}),
+		frameRate: 5,
+		repeat: -1
+	});
+
+	this.anims.create({
 		key: 'gauche',
 		frames: this.anims.generateFrameNumbers('ennemis', {start: 0, end: 7}),
 		frameRate: 5,
@@ -230,8 +238,7 @@ function update(){
 
 
 	if(cursors.left.isDown){
-		player.anims.play('left', true);
-		player.anims.play('idle', false);
+		player.anims.play('walk', true);
 		player.setVelocityX(-100);
 		player.setFlipX(true);
 		//SPRINT
@@ -240,8 +247,7 @@ function update(){
 			}
 	}else if(cursors.right.isDown){
 		player.setVelocityX(100);
-		player.anims.play('left', true);
-		player.anims.play('idle', false);
+		player.anims.play('walk', true);
 		player.setFlipX(false);
 		//SPRINT
 			if (this.ctrl.isDown) {
@@ -253,7 +259,7 @@ function update(){
 // Double Jump
 	if (!player.body.touching.down) {
 		player.anims.play('jump', true);
-	} else {
+	} else if (player.body.touching.down && !cursors.left.isDown && !cursors.right.isDown){
 		player.anims.play('idle', true);
 	}
 
